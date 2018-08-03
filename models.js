@@ -16,7 +16,8 @@ const trailerSchema = mongoose.Schema({
     moving:             Boolean,
     movingStartTime:    String,
     stopped:            Boolean,
-    stoppedStartTime:   String
+    stoppedStartTime:   String,
+    status:             String
 });
 
 let Trailer = mongoose.model('trailers',trailerSchema);
