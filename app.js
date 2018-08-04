@@ -13,7 +13,9 @@ mongoose.connect(dbURL + '/' + dbName)
 const models = require('./models')
 var ObjectId = require('mongodb').ObjectID;
 
-app.get('/', function (req, res) {
+var minutes = 5, the_interval = minutes * 60 * 1000;
+
+setInterval(function() {
     var data;
     var ndata = [];
     var k=0; // not null data counter
@@ -58,8 +60,7 @@ app.get('/', function (req, res) {
             console.log(c + " docs updated")
         }else console.log("success: false")
       })
-  res.send('Hello World!');
-});
+}, the_interval)
 
 app.listen(3000, function () {
   console.log('Example app listening on port 3000!');
