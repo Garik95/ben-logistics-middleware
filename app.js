@@ -3,8 +3,10 @@ var axios = require('axios');
 var jsonQuery = require('json-query');
 const mongoose = require('mongoose');
 var app = express();
+const url = 'http://localhost:3000/graphql';
+var token;
 
-const token = 'YXppekBkbXd0cmFucy5jb206cGFzc3dvcmQ=';
+// const token = 'YXppekBkbXd0cmFucy5jb206cGFzc3dvcmQ=';
 
 // Import configuration and connect to DB
 const { dbURL, dbName } = require('./config')
@@ -16,7 +18,13 @@ var ObjectId = require('mongodb').ObjectID;
 var minutes = 5, the_interval = minutes * 60 * 1000;
 
 setInterval(function() {
-    var data;
+
+    axios.post(url,{
+        query: `{ token (service:"FleetNetwork"){ token } }`
+    }).then(res => {
+        if( res.data.data.token.length > 0) {
+            token = res.data.data.token[0].token
+            var data;
     var ndata = [];
     var k=0; // not null data counter
     var c=0; // updated doc number
@@ -26,42 +34,49 @@ setInterval(function() {
         }}).then(response => {
         if(response.data.success === true){
             data = response.data.data;
-            for(var i = 0;i<data.length; i++)
-            {
-                if(data[i].name != null) {
-                    models.Trailer.update(
-                        {"id":data[i].id},
-                        {"$set":{
-                            "address":data[i].address,
-                            "city":data[i].city,
-                            "state":data[i].state,
-                            "name":data[i].name,
-                            "serial":data[i].serial,
-                            "lat":data[i].lat,
-                            "lng":data[i].lng,
-                            "zip":data[i].zip,
-                            "moving":data[i].moving,
-                            "movingStartTime":data[i].movingStartTime,
-                            "stopped":data[i].stopped,
-                            "stoppedStartTime":data[i].stoppedStartTime
-                        }
-                    },{upsert:true},function(err,res){
-                        if(err) console.log(err);
-                        else c++;
-                    })
-                    k++;
+                for(var i = 0;i<data.length; i++)
+                {
+                    if(data[i].name != null) {
+                        models.Trailer.update(
+                            {"id":data[i].id},
+                            {"$set":{
+                                "address":data[i].address,
+                                "city":data[i].city,
+                                "state":data[i].state,
+                                "name":data[i].name,
+                                "serial":data[i].serial,
+                                "lat":data[i].lat,
+                                "lng":data[i].lng,
+                                "zip":data[i].zip,
+                                "moving":data[i].moving,
+                                "movingStartTime":data[i].movingStartTime,
+                                "stopped":data[i].stopped,
+                                "stoppedStartTime":data[i].stoppedStartTime
+                            }
+                        },{upsert:true},function(err,res){
+                            if(err) console.log(err);
+                            else c++;
+                        })
+                        k++;
+                    }
                 }
-            }
-            var newlog = new models.Updatelog({
-                rownum:     k,
-                updated:    c
-            });
-            newlog.save();
-            console.log(c + " docs updated")
-        }else console.log("success: false")
-      })
+                var newlog = new models.Updatelog({
+                    rownum:     k,
+                    updated:    c
+                });
+                newlog.save();
+                console.log(c + " docs updated")
+            }else console.log("success: false")
+        })
+        }
+        else {
+            console.log("Fetch data error!")
+        }
+    }).catch(e => {
+        console.log(e);
+    })
 }, the_interval)
 
-app.listen(3000, function () {
-  console.log('Example app listening on port 3000!');
+app.listen(3001, function () {
+  console.log('Example app listening on port 3001!');
 });
