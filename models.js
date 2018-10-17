@@ -22,6 +22,24 @@ const trailerSchema = mongoose.Schema({
 
 let Trailer = mongoose.model('trailers',trailerSchema);
 
+const locationsSchema = mongoose.Schema({
+    truckid:            Number,
+    latitude:           Number,
+    longitude:          Number
+});
+
+let Location = mongoose.model('locations',locationsSchema);
+
+const driversSchema = mongoose.Schema({
+    id:                 Number,
+    first_name:         String,
+    last_name:          String,
+    email:              String,
+    truckid:            Number
+})
+
+let Driver =mongoose.model('drivers',driversSchema);
+
 const updatelogSchema = mongoose.Schema({
     logtime: {type: Date, default: Date.now},
     rownum:     Number,
@@ -32,5 +50,7 @@ let Updatelog = mongoose.model('updatelogs',updatelogSchema);
 
 module.exports = {
     Trailer:Trailer,
-    Updatelog:Updatelog
+    Updatelog:Updatelog,
+    Driver:Driver,
+    Location:Location
 }
