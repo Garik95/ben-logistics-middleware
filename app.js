@@ -16,7 +16,7 @@ const models = require('./models')
 var ObjectId = require('mongodb').ObjectID;
 
 var minutes = 2.5, the_interval = minutes * 60 * 1000;
-var switcher = 2;
+var switcher = 1;
 var isError;
 
 setInterval(function() {
