@@ -3,7 +3,7 @@ var axios = require('axios');
 var jsonQuery = require('json-query');
 const mongoose = require('mongoose');
 var app = express();
-const url = 'http://localhost:3000/graphql';
+const url = 'http://ben-logistics-api.eu-4.evennode.com/graphql/';
 var token;
 
 // const token = 'YXppekBkbXd0cmFucy5jb206cGFzc3dvcmQ=';
@@ -193,6 +193,6 @@ setInterval(function() {
     }
 }, the_interval)
 
-app.listen(3001, function () {
-  console.log('Example app listening on port 3001!');
+app.listen(3000, function () {
+  console.log('Example app listening on port 3000!');
 });
