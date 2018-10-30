@@ -27,14 +27,13 @@ setInterval(function() {
             if( res.data.data.token.length > 0) {
                 token = res.data.data.token[0].token
                 var data;
-        var ndata = [];
-        var k=0; // not null data counter
-        var c=0; // updated doc number
         axios.get('https://api.us.spireon.com/api/assetStatus', {
             headers: {
-            'Authorization': 'Basic ' + token
+            'Authorization': 'Basic ' + token,
+            'Account': 192655
             }}).then(response => {
-            if(response.data.success === true){
+            console.log(response.data.count);
+            if(response.data.success == true){
                 data = response.data.data;
                     for(var i = 0;i<data.length; i++)
                     {
@@ -57,9 +56,7 @@ setInterval(function() {
                                 }
                             },{upsert:true},function(err,res){
                                 if(err) console.log(err);
-                                else c++;
                             })
-                            k++;
                         }
                     }
                     // var newlog = new models.Updatelog({
@@ -70,6 +67,46 @@ setInterval(function() {
                     console.log("Trailers location updated successfully")
                 }else console.log("success: false")
             })
+            axios.get('https://api.us.spireon.com/api/assetStatus', {
+                headers: {
+                'Authorization': 'Basic ' + token,
+                'Account': 110733
+                }}).then(response => {
+                console.log(response.data.count);
+                if(response.data.success == true){
+                    data = response.data.data;
+                        for(var i = 0;i<data.length; i++)
+                        {
+                            if(data[i].name != null) {
+                                models.Trailer.update(
+                                    {"id":data[i].id},
+                                    {"$set":{
+                                        "address":data[i].address,
+                                        "city":data[i].city,
+                                        "state":data[i].state,
+                                        "name":data[i].name,
+                                        "serial":data[i].serial,
+                                        "lat":data[i].lat,
+                                        "lng":data[i].lng,
+                                        "zip":data[i].zip,
+                                        "moving":data[i].moving,
+                                        "movingStartTime":data[i].movingStartTime,
+                                        "stopped":data[i].stopped,
+                                        "stoppedStartTime":data[i].stoppedStartTime
+                                    }
+                                },{upsert:true},function(err,res){
+                                    if(err) console.log(err);
+                                })
+                            }
+                        }
+                        // var newlog = new models.Updatelog({
+                        //     rownum:     k,
+                        //     updated:    c
+                        // });
+                        // newlog.save();
+                        console.log("Trailers location updated successfully")
+                    }else console.log("success: false")
+                })
             }
             else {
                 console.log("Fetch data error!")
