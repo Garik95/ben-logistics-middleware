@@ -48,9 +48,24 @@ const updatelogSchema = mongoose.Schema({
 
 let Updatelog = mongoose.model('updatelogs',updatelogSchema);
 
+const truckSchema = mongoose.Schema({
+    id:                 Number,
+    vin:                String,
+    label:              String,
+    color:              String,
+    make:               String,
+    model:              String,
+    deviceSerialNumber: String,
+    year:               Number,
+    isAvailable:        String    
+});
+
+let Truck = mongoose.model('trucks',truckSchema);
+
 module.exports = {
     Trailer:Trailer,
     Updatelog:Updatelog,
     Driver:Driver,
-    Location:Location
+    Location:Location,
+    Truck:Truck
 }

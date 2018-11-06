@@ -15,7 +15,7 @@ mongoose.connect(dbURL + '/' + dbName)
 const models = require('./models')
 var ObjectId = require('mongodb').ObjectID;
 
-var minutes = 2.5, the_interval = minutes * 60 * 1000;
+var minutes = 0.5, the_interval = minutes * 60 * 1000;
 var switcher = 1;
 var isError;
 
@@ -52,7 +52,8 @@ setInterval(function() {
                                     "moving":data[i].moving,
                                     "movingStartTime":data[i].movingStartTime,
                                     "stopped":data[i].stopped,
-                                    "stoppedStartTime":data[i].stoppedStartTime
+                                    "stoppedStartTime":data[i].stoppedStartTime,
+                                    "status":"available"
                                 }
                             },{upsert:true},function(err,res){
                                 if(err) console.log(err);
@@ -142,11 +143,6 @@ setInterval(function() {
                                 if(err) {console.log(err); isError = 1;}
                                 });
                             }
-                            {
-                                models.Driver.update({"id":data[i]["@id"]},{$set:{"first_name":data[i].firstName,"last_name":data[i].lastName,"email":data[i].emailAddress,"truckid":0}},{upsert:true}, function(err, res){
-                                    if(err) {console.log(err); isError = 1;}
-                                });
-                            }
                         }
                         if(isError != 1) { console.log("Drivers data succesfully updated!"); }
                         if(isError == 1) { console.log("Seems access token invalid!")}
@@ -192,7 +188,7 @@ setInterval(function() {
                         if(isError != 1) { console.log("Drivers location succesfully updated!"); }
                         if(isError == 1) { console.log("Seems access token invalid!")}
                     }
-                    switcher = 1;
+                    switcher = 5;
                     console.log("switcher = 1");
                 }).catch(e => {
                     switcher = 4;
@@ -206,6 +202,63 @@ setInterval(function() {
             console.log("switcher = 3");
         })
     }
+
+    if(switcher == 5) {
+        axios.post(url,{
+            query: `{ token (service:"NetworkFleet"){ token } }`
+        }).then(res => {
+            if( res.data.data.token.length > 0) {
+                token = res.data.data.token[0].token
+                axios.get('https://api.networkfleet.com/vehicles?limit=1000',{
+                    headers:{
+                        'Content-Type':'application/vnd.networkfleet.api-v1+json',
+                        'Accept':'application/vnd.networkfleet.api-v1+json',
+                        'Authorization':'Bearer ' + token
+                    }
+                }).then(response => {
+                    console.log(response.data.count)
+                    if(response.data.count)
+                    {
+                        var truck;
+                        for (var i=0; i< response.data.vehicle.length; i++)
+                        {
+                            models.Truck.update(
+                                {id:response.data.vehicle[i]["@id"]},
+                                {
+                                id:                     response.data.vehicle[i]["@id"],
+                                vin:                    response.data.vehicle[i]["vin"]["value"],
+                                label:                  response.data.vehicle[i].label,
+                                color:                  response.data.vehicle[i].color,
+                                make:                   response.data.vehicle[i].make,
+                                model:                  response.data.vehicle[i].model,
+                                deviceSerialNumber:     response.data.vehicle[i].deviceSerialNumber.value,
+                                year:                   response.data.vehicle[i].year,
+                                isAvailable:            "true"
+                                },
+                                {upsert:true}, function(err, res){
+                                    if(err) {console.log(err); isError = 1;}
+                                }
+                            );
+                        }
+                        if(isError != 1) { console.log("Trucks data succesfully updated!"); }
+                        if(isError == 1) { console.log("Seems access token invalid!")}
+                    }
+                    switcher = 1;
+                    console.log("switcher = 1");
+                }).catch(e => {
+                    switcher = 4;
+                    // console.log(e);
+                    console.log("switcher = 4");
+                })
+            }
+            else {
+                console.log("Fetch data error!")
+            }
+        }).catch(e => {
+            console.log("switcher = 5");
+        })
+    }
+
     if(switcher == 4) {
         axios.post("https://auth.networkfleet.com/token",
             "grant_type=password&username=Dispatch16&password=dispatch16",{
@@ -219,10 +272,10 @@ setInterval(function() {
                     query: 'mutation { updateToken(service:"NetworkFleet",token:"' + res.data.access_token +'"){name service token }}'
                 })
             }
-            switcher = 1;
+            switcher = 5;
             console.log(res.data);
             console.log("Token successfully updated!")
-            console.log("switcher = 1");
+            console.log("switcher = 5");
         }).catch(e => {
             console.log("switcher = 4");
         })
