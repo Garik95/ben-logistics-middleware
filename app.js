@@ -234,7 +234,7 @@ setInterval(function() {
                                 model:                  response.data.vehicle[i].model,
                                 deviceSerialNumber:     response.data.vehicle[i].deviceSerialNumber.value,
                                 year:                   response.data.vehicle[i].year,
-                                isAvailable:            "true"
+                                // isAvailable:            "true"
                                 },
                                 {upsert:true}, function(err, res){
                                     if(err) {console.log(err); isError = 1;}
