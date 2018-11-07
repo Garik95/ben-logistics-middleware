@@ -27,7 +27,7 @@ setInterval(function() {
             if( res.data.data.token.length > 0) {
                 token = res.data.data.token[0].token
                 var data;
-        axios.get('https://api.us.spireon.com/api/assetStatus', {
+        axios.get('https://api.us.spireon.com/api/assetStatus?max=2000', {
             headers: {
             'Authorization': 'Basic ' + token,
             'Account': 192655
@@ -68,7 +68,7 @@ setInterval(function() {
                     console.log("Trailers location updated successfully")
                 }else console.log("success: false")
             })
-            axios.get('https://api.us.spireon.com/api/assetStatus', {
+            axios.get('https://api.us.spireon.com/api/assetStatus?max=2000', {
                 headers: {
                 'Authorization': 'Basic ' + token,
                 'Account': 110733
