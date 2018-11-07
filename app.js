@@ -53,7 +53,7 @@ setInterval(function() {
                                     "movingStartTime":data[i].movingStartTime,
                                     "stopped":data[i].stopped,
                                     "stoppedStartTime":data[i].stoppedStartTime,
-                                    "status":"available"
+                                    // "status":"available"
                                 }
                             },{upsert:true},function(err,res){
                                 if(err) console.log(err);
@@ -94,7 +94,7 @@ setInterval(function() {
                                         "movingStartTime":data[i].movingStartTime,
                                         "stopped":data[i].stopped,
                                         "stoppedStartTime":data[i].stoppedStartTime,
-                                        "status":"available"
+                                        // "status":"available"
                                     }
                                 },{upsert:true},function(err,res){
                                     if(err) console.log(err);
